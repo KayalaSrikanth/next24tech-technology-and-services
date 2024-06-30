@@ -1,0 +1,52 @@
+import tkinter as tk
+from tkinter import scrolledtext, messagebox
+from chatterbot import ChatBot
+from chatterbot.trainers import ChatterBotCorpusTrainer
+
+# Create a ChatBot instance
+chatbot = ChatBot('MyBot')
+
+# Optionally, you can train the chatbot on a specific dataset or corpus
+trainer = ChatterBotCorpusTrainer(chatbot)
+trainer.train('chatterbot.corpus.english')  # Training on English corpus
+
+# Function to send a message and get a response from the chatbot
+def send():
+    message = entry_message.get()
+    if not message:
+        messagebox.showwarning("Warning", "Please enter a message.")
+        return
+    
+    response = chatbot.get_response(message)
+    text_conversation.configure(state=tk.NORMAL)
+    text_conversation.insert(tk.END, "You: " + message + "\n")
+    text_conversation.insert(tk.END, "Bot: " + str(response) + "\n\n")
+    text_conversation.configure(state=tk.DISABLED)
+    
+    entry_message.delete(0, tk.END)
+
+# Create the main window
+root = tk.Tk()
+root.title("ChatBot")
+
+# Create a scrolled text widget for the conversation display
+text_conversation = scrolledtext.ScrolledText(root, width=50, height=20, state=tk.DISABLED)
+text_conversation.grid(row=0, column=0, columnspan=2, padx=10, pady=10)
+
+# Create an entry widget for user input
+entry_message = tk.Entry(root, width=40)
+entry_message.grid(row=1, column=0, padx=10, pady=10)
+
+# Create a send button
+send_button = tk.Button(root, text="Send", command=send)
+send_button.grid(row=1, column=1, padx=10, pady=10)
+
+# Function to handle pressing Enter key
+def on_enter_key(event):
+    send()
+
+# Bind the Enter key to send the message
+root.bind('<Return>', on_enter_key)
+
+# Run the main event loop
+root.mainloop()
